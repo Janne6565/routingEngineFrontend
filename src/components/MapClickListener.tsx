@@ -6,7 +6,6 @@ interface Props {
 }
 
 function MapClickListener(props: Props) {
-  const {} = props;
   useMapEvents({
     click: (e) => {
       props.onclick(e.latlng);

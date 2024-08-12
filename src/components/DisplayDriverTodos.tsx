@@ -1,7 +1,6 @@
-import React, { act } from "react";
-import { paths, operations, components } from "../api/routingEngine/schema";
-import { RouteInstructionResponse } from "../hooks/useApi";
 import { Chart } from "react-google-charts";
+import { components } from "../api/routingEngine/schema";
+import { RouteInstructionResponse } from "../hooks/useApi";
 
 interface Props {
   routerInstructionResponse: RouteInstructionResponse;
@@ -50,7 +49,9 @@ function DisplayDriverTodos(props: Props) {
   const convertRouteToRows = (route: components["schemas"]["VehicleRoute"]) =>
     route.activities?.map((activity) => [
       "activity" + activity.index,
-      route.tourActivities?.jobs?.filter((job) => job.index == activity.index).at(0)?.name, 
+      route.tourActivities?.jobs
+        ?.filter((job) => job.index == activity.index)
+        .at(0)?.name,
       minutesToDate(activity.arrTime ?? 0),
       minutesToDate(activity.endTime ?? 0),
       activity.operationTime,
@@ -58,11 +59,11 @@ function DisplayDriverTodos(props: Props) {
       "",
     ]) ?? [];
 
-  return routes?.map((route) => (
-    <>
+  return routes?.map((route, index) => (
+    <div key={index}>
       <h1>{route.vehicle?.id ?? ""}</h1>
       <Chart chartType="Gantt" data={[columns, ...convertRouteToRows(route)]} />
-    </>
+    </div>
   ));
 }
 

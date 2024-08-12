@@ -1,8 +1,7 @@
-import React from "react";
-import { VehicleDto } from "../App";
-import { Marker, Popup } from "react-leaflet";
-import carImage from "../assets/Car icon.svg";
 import L from "leaflet";
+import { Marker, Popup } from "react-leaflet";
+import { VehicleDto } from "../App";
+import carImage from "../assets/Car icon.svg";
 
 interface Props {
   driver: VehicleDto;
@@ -38,9 +37,7 @@ function DriverMarkerComponent(props: Props) {
               Time Window: {props.driver.earliestTime} -{" "}
               {props.driver.latestTime}
             </p>
-            <p>
-              Capacity: {props.driver.capacity}
-            </p>
+            <p>Capacity: {props.driver.capacity}</p>
           </div>
         </Popup>
       </Marker>

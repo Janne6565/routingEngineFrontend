@@ -11,7 +11,9 @@
     "openapi": "npx openapi-typescript http://localhost:8080/api-docs --output src/api/routingEngine/schema.ts"
   },
   "dependencies": {
+    "@mapbox/polyline": "^1.2.1",
     "@tanstack/react-query": "^5.51.21",
+    "geojson": "^0.5.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",
+    "@types/mapbox__polyline": "^1.0.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",

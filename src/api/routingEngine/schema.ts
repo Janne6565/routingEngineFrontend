@@ -40,7 +40,7 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        Coordinate: {
+        CoordinateDto: {
             /** Format: double */
             lat: number;
             /** Format: double */
@@ -52,7 +52,7 @@ export interface components {
         };
         JobDto: {
             id?: string;
-            position: components["schemas"]["Coordinate"];
+            position: components["schemas"]["CoordinateDto"];
             /** Format: double */
             serviceTime?: number;
             /** Format: double */
@@ -62,7 +62,7 @@ export interface components {
         };
         VehicleDto: {
             id?: string;
-            position: components["schemas"]["Coordinate"];
+            position: components["schemas"]["CoordinateDto"];
             /** Format: double */
             capacity?: number;
             /** Format: double */
@@ -95,14 +95,20 @@ export interface components {
             /** Format: double */
             maxTimeInVehicle?: number;
             activities?: components["schemas"]["Activity"][];
+            requiredSkills?: components["schemas"]["Skills"];
             /** Format: double */
             serviceDuration?: number;
-            requiredSkills?: components["schemas"]["Skills"];
             timeWindow?: components["schemas"]["TimeWindow"];
         };
         Capacity: {
             /** Format: int32 */
             nuOfDimensions?: number;
+        };
+        Coordinate: {
+            /** Format: double */
+            x?: number;
+            /** Format: double */
+            y?: number;
         };
         Driver: {
             id?: string;
@@ -115,25 +121,25 @@ export interface components {
             /** Format: double */
             arrTime?: number;
             location?: components["schemas"]["Location"];
-            name?: string;
-            size?: components["schemas"]["Capacity"];
             /** Format: double */
             theoreticalEarliestOperationStartTime?: number;
             /** Format: double */
             theoreticalLatestOperationStartTime?: number;
             /** Format: double */
             operationTime?: number;
+            name?: string;
+            size?: components["schemas"]["Capacity"];
         };
         Job: {
+            requiredSkills?: components["schemas"]["Skills"];
+            /** Format: double */
+            maxTimeInVehicle?: number;
+            activities?: components["schemas"]["Activity"][];
             name?: string;
             /** Format: int32 */
             priority?: number;
             id?: string;
             size?: components["schemas"]["Capacity"];
-            /** Format: double */
-            maxTimeInVehicle?: number;
-            requiredSkills?: components["schemas"]["Skills"];
-            activities?: components["schemas"]["Activity"][];
             /** Format: int32 */
             index?: number;
         };
@@ -154,14 +160,14 @@ export interface components {
             /** Format: double */
             arrTime?: number;
             location?: components["schemas"]["Location"];
-            name?: string;
-            size?: components["schemas"]["Capacity"];
             /** Format: double */
             theoreticalEarliestOperationStartTime?: number;
             /** Format: double */
             theoreticalLatestOperationStartTime?: number;
             /** Format: double */
             operationTime?: number;
+            name?: string;
+            size?: components["schemas"]["Capacity"];
         };
         TimeWindow: {
             /** Format: double */
@@ -171,15 +177,12 @@ export interface components {
         };
         TourActivities: {
             jobs?: components["schemas"]["Job"][];
-            empty?: boolean;
             activities?: components["schemas"]["TourActivity"][];
+            empty?: boolean;
         };
         TourActivity: {
             /** Format: double */
             endTime?: number;
-            name?: string;
-            location?: components["schemas"]["Location"];
-            size?: components["schemas"]["Capacity"];
             /** Format: double */
             theoreticalEarliestOperationStartTime?: number;
             /** Format: double */
@@ -188,13 +191,14 @@ export interface components {
             operationTime?: number;
             /** Format: double */
             arrTime?: number;
+            name?: string;
+            location?: components["schemas"]["Location"];
+            size?: components["schemas"]["Capacity"];
             /** Format: int32 */
             index?: number;
         };
         Vehicle: {
             userData?: Record<string, never>;
-            id?: string;
-            type?: components["schemas"]["VehicleType"];
             vehicleTypeIdentifier?: components["schemas"]["VehicleTypeKey"];
             /** Format: double */
             earliestDeparture?: number;
@@ -205,6 +209,8 @@ export interface components {
             endLocation?: components["schemas"]["Location"];
             skills?: components["schemas"]["Skills"];
             break?: components["schemas"]["Break"];
+            id?: string;
+            type?: components["schemas"]["VehicleType"];
             /** Format: int32 */
             index?: number;
         };
@@ -226,10 +232,10 @@ export interface components {
             driver?: components["schemas"]["Driver"];
             start?: components["schemas"]["Start"];
             end?: components["schemas"]["End"];
-            empty?: boolean;
             /** Format: double */
             departureTime?: number;
             activities?: components["schemas"]["TourActivity"][];
+            empty?: boolean;
         };
         VehicleRoutingProblemSolution: {
             routes?: components["schemas"]["VehicleRoute"][];
@@ -241,10 +247,10 @@ export interface components {
             userData?: Record<string, never>;
             capacityDimensions?: components["schemas"]["Capacity"];
             vehicleCostParams?: components["schemas"]["VehicleCostParams"];
+            profile?: string;
+            typeId?: string;
             /** Format: double */
             maxVelocity?: number;
-            typeId?: string;
-            profile?: string;
         };
         VehicleTypeKey: {
             /** Format: int32 */
@@ -353,8 +359,8 @@ export interface operations {
     route: {
         parameters: {
             query: {
-                from: components["schemas"]["Coordinate"];
-                to: components["schemas"]["Coordinate"];
+                from: components["schemas"]["CoordinateDto"];
+                to: components["schemas"]["CoordinateDto"];
             };
             header?: never;
             path?: never;

@@ -1,0 +1,759 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/route": {
+      "get": {
+        "tags": [
+          "controller"
+        ],
+        "operationId": "route",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Coordinate"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Coordinate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fleetInstructions": {
+      "get": {
+        "tags": [
+          "controller"
+        ],
+        "operationId": "vehicleRoutingProblemSolver",
+        "parameters": [
+          {
+            "name": "fleetInstructionsRequest",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FleetInstructionsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleRoutingProblemSolution"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Coordinate": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Hints": {
+        "type": "object",
+        "properties": {
+          "visitedNodesSum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visitedNodesAverage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Info": {
+        "type": "object",
+        "properties": {
+          "copyrights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "took": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadDataTimeStamp": {
+            "type": "string"
+          }
+        }
+      },
+      "Instruction": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number",
+            "format": "double"
+          },
+          "heading": {
+            "type": "number",
+            "format": "double"
+          },
+          "sign": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "interval": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "text": {
+            "type": "string"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "streetName": {
+            "type": "string"
+          },
+          "lastHeading": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Leg": {
+        "type": "object"
+      },
+      "Path": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number",
+            "format": "double"
+          },
+          "weight": {
+            "type": "number",
+            "format": "double"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "transfers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsEncoded": {
+            "type": "boolean"
+          },
+          "pointsEncodedMultiplier": {
+            "type": "number",
+            "format": "double"
+          },
+          "bbox": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "points": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Instruction"
+            }
+          },
+          "legs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Leg"
+            }
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "ascend": {
+            "type": "number",
+            "format": "double"
+          },
+          "descend": {
+            "type": "number",
+            "format": "double"
+          },
+          "snappedWaypoints": {
+            "type": "string"
+          }
+        }
+      },
+      "RouteResponse": {
+        "type": "object",
+        "properties": {
+          "hints": {
+            "$ref": "#/components/schemas/Hints"
+          },
+          "info": {
+            "$ref": "#/components/schemas/Info"
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Path"
+            }
+          }
+        }
+      },
+      "FleetInstructionsRequest": {
+        "type": "object",
+        "properties": {
+          "startPositions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Coordinate"
+            }
+          },
+          "jobPositions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Coordinate"
+            }
+          }
+        }
+      },
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "timeWindows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeWindow"
+            }
+          },
+          "serviceTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "PICKUP",
+              "DELIVERY",
+              "SERVICE",
+              "BREAK"
+            ]
+          }
+        }
+      },
+      "Break": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userData": {
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "timeWindows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeWindow"
+            }
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxTimeInVehicle": {
+            "type": "number",
+            "format": "double"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          },
+          "requiredSkills": {
+            "$ref": "#/components/schemas/Skills"
+          },
+          "serviceDuration": {
+            "type": "number",
+            "format": "double"
+          },
+          "timeWindow": {
+            "$ref": "#/components/schemas/TimeWindow"
+          }
+        }
+      },
+      "Capacity": {
+        "type": "object",
+        "properties": {
+          "nuOfDimensions": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "End": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "endTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "arrTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "theoreticalEarliestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "theoreticalLatestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "operationTime": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Job": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "requiredSkills": {
+            "$ref": "#/components/schemas/Skills"
+          },
+          "maxTimeInVehicle": {
+            "type": "number",
+            "format": "double"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          },
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "coordinate": {
+            "$ref": "#/components/schemas/Coordinate"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "userData": {
+            "type": "object"
+          }
+        }
+      },
+      "Skills": {
+        "type": "object"
+      },
+      "Start": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "endTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "arrTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "theoreticalEarliestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "theoreticalLatestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "operationTime": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TimeWindow": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number",
+            "format": "double"
+          },
+          "end": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TourActivities": {
+        "type": "object",
+        "properties": {
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "empty": {
+            "type": "boolean"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourActivity"
+            }
+          }
+        }
+      },
+      "TourActivity": {
+        "type": "object",
+        "properties": {
+          "endTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "size": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "theoreticalEarliestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "theoreticalLatestOperationStartTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "operationTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "arrTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "userData": {
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/VehicleType"
+          },
+          "vehicleTypeIdentifier": {
+            "$ref": "#/components/schemas/VehicleTypeKey"
+          },
+          "earliestDeparture": {
+            "type": "number",
+            "format": "double"
+          },
+          "latestArrival": {
+            "type": "number",
+            "format": "double"
+          },
+          "returnToDepot": {
+            "type": "boolean"
+          },
+          "startLocation": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "endLocation": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "skills": {
+            "$ref": "#/components/schemas/Skills"
+          },
+          "break": {
+            "$ref": "#/components/schemas/Break"
+          },
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "VehicleCostParams": {
+        "type": "object",
+        "properties": {
+          "fix": {
+            "type": "number",
+            "format": "double"
+          },
+          "perTransportTimeUnit": {
+            "type": "number",
+            "format": "double"
+          },
+          "perDistanceUnit": {
+            "type": "number",
+            "format": "double"
+          },
+          "perWaitingTimeUnit": {
+            "type": "number",
+            "format": "double"
+          },
+          "perServiceTimeUnit": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "VehicleRoute": {
+        "type": "object",
+        "properties": {
+          "tourActivities": {
+            "$ref": "#/components/schemas/TourActivities"
+          },
+          "vehicle": {
+            "$ref": "#/components/schemas/Vehicle"
+          },
+          "driver": {
+            "$ref": "#/components/schemas/Driver"
+          },
+          "start": {
+            "$ref": "#/components/schemas/Start"
+          },
+          "end": {
+            "$ref": "#/components/schemas/End"
+          },
+          "empty": {
+            "type": "boolean"
+          },
+          "departureTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourActivity"
+            }
+          }
+        }
+      },
+      "VehicleRoutingProblemSolution": {
+        "type": "object",
+        "properties": {
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleRoute"
+            }
+          },
+          "unassignedJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "cost": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "VehicleType": {
+        "type": "object",
+        "properties": {
+          "userData": {
+            "type": "object"
+          },
+          "capacityDimensions": {
+            "$ref": "#/components/schemas/Capacity"
+          },
+          "vehicleCostParams": {
+            "$ref": "#/components/schemas/VehicleCostParams"
+          },
+          "typeId": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "maxVelocity": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "VehicleTypeKey": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "startLocationId": {
+            "type": "string"
+          },
+          "endLocationId": {
+            "type": "string"
+          },
+          "earliestStart": {
+            "type": "number",
+            "format": "double"
+          },
+          "latestEnd": {
+            "type": "number",
+            "format": "double"
+          },
+          "skills": {
+            "$ref": "#/components/schemas/Skills"
+          },
+          "returnToDepot": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

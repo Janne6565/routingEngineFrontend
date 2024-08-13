@@ -37,7 +37,7 @@ const loadGeoJsonFromResponse = (
 };
 
 const useApi = (baseUrl: string) => {
-  const getRoute = (data: operations["route"]["parameters"]["query"]) =>
+  const useRoute = (data: operations["route"]["parameters"]["query"]) =>
     useQuery({
       queryKey: ["getRoute"],
       queryFn: async () => {
@@ -99,12 +99,12 @@ const useApi = (baseUrl: string) => {
           geoJsons: geoJsons,
         };
       },
-      enabled: false
+      enabled: false,
     });
 
   return {
     useOptimalRouteInstruction,
-    getRoute,
+    getRoute: useRoute,
   };
 };
 

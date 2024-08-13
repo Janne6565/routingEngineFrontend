@@ -42,8 +42,10 @@ function MapComponent(props: Props) {
             y="0"
             width="100%"
             height="100%"
-            fill="blue"
-            opacity={0.1}
+            fill="none"
+            stroke="black"
+            strokeOpacity={0.5}
+            strokeWidth={2}
           />
           {props.driverPositions.map((driver: VehicleDto) => (
             <DriverMarkerComponent

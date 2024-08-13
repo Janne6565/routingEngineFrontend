@@ -22,8 +22,8 @@ function MapComponent(props: Props) {
   return (
     <>
       <MapContainer
-        center={[52.505284, 13.418273]}
-        zoom={13}
+        center={[52.505284, 11.418273]}
+        zoom={7}
         scrollWheelZoom={true}
         style={{ height: "60vh", width: "60vw" }}
       >

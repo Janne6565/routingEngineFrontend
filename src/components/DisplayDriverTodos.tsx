@@ -1,4 +1,3 @@
-import { Chart } from "react-google-charts";
 import { components } from "../api/routingEngine/schema";
 import { RouteInstructionResponse } from "../hooks/useApi";
 
@@ -58,11 +57,26 @@ function DisplayDriverTodos(props: Props) {
       100,
       "",
     ]) ?? [];
+  const convertTime = (time: number | undefined) => {
+    return time ? Math.round(time) + "min" : "";
+  };
 
   return routes?.map((route, index) => (
     <div key={index}>
       <h1>{route.vehicle?.id ?? ""}</h1>
-      <Chart chartType="Gantt" data={[columns, ...convertRouteToRows(route)]} />
+      <div className="route">
+        {"0min HomeLocation -> "}{" "}
+        {route.activities?.map(
+          (activity) =>
+            convertTime(activity.arrTime) +
+            " " +
+            activity.job.name +
+            " " +
+            convertTime(activity.endTime) +
+            " -> "
+        )}
+        {"HomeLocation"} {convertTime(route.end?.arrTime)}
+      </div>
     </div>
   ));
 }

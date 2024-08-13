@@ -69,7 +69,6 @@ function App() {
     [60.4363296, 25.1965582],
   ];
 
-
   const placePoint = useCallback(
     (position: LatLng) => {
       if (currentPlacementType === "job") {

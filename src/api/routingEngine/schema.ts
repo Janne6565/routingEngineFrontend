@@ -4,379 +4,381 @@
  */
 
 export interface paths {
-    "/fleetInstructions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["vehicleRoutingProblemSolver"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/fleetInstructions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/route": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["route"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post: operations["vehicleRoutingProblemSolver"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/route": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get: operations["route"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        CoordinateDto: {
-            /** Format: double */
-            lat: number;
-            /** Format: double */
-            lng: number;
-        };
-        FleetInstructionsRequest: {
-            vehicles?: components["schemas"]["VehicleDto"][];
-            jobs?: components["schemas"]["JobDto"][];
-        };
-        JobDto: {
-            id?: string;
-            position: components["schemas"]["CoordinateDto"];
-            /** Format: double */
-            serviceTime?: number;
-            /** Format: double */
-            earliestTime?: number;
-            /** Format: double */
-            latestTime?: number;
-        };
-        VehicleDto: {
-            id?: string;
-            position: components["schemas"]["CoordinateDto"];
-            /** Format: double */
-            capacity?: number;
-            /** Format: double */
-            earliestTime?: number;
-            /** Format: double */
-            latestTime?: number;
-            /** Format: double */
-            serviceTime?: number;
-        };
-        Activity: {
-            location?: components["schemas"]["Location"];
-            timeWindows?: components["schemas"]["TimeWindow"][];
-            /** Format: double */
-            serviceTime?: number;
-            /** @enum {string} */
-            activityType?: "PICKUP" | "DELIVERY" | "SERVICE" | "BREAK";
-        };
-        Break: {
-            /** Format: int32 */
-            index?: number;
-            userData?: Record<string, never>;
-            id?: string;
-            type?: string;
-            size?: components["schemas"]["Capacity"];
-            name?: string;
-            location?: components["schemas"]["Location"];
-            timeWindows?: components["schemas"]["TimeWindow"][];
-            /** Format: int32 */
-            priority?: number;
-            /** Format: double */
-            maxTimeInVehicle?: number;
-            activities?: components["schemas"]["Activity"][];
-            requiredSkills?: components["schemas"]["Skills"];
-            /** Format: double */
-            serviceDuration?: number;
-            timeWindow?: components["schemas"]["TimeWindow"];
-        };
-        Capacity: {
-            /** Format: int32 */
-            nuOfDimensions?: number;
-        };
-        Coordinate: {
-            /** Format: double */
-            x?: number;
-            /** Format: double */
-            y?: number;
-        };
-        Driver: {
-            id?: string;
-        };
-        End: {
-            /** Format: int32 */
-            index?: number;
-            /** Format: double */
-            endTime?: number;
-            /** Format: double */
-            arrTime?: number;
-            location?: components["schemas"]["Location"];
-            /** Format: double */
-            theoreticalEarliestOperationStartTime?: number;
-            /** Format: double */
-            theoreticalLatestOperationStartTime?: number;
-            /** Format: double */
-            operationTime?: number;
-            name?: string;
-            size?: components["schemas"]["Capacity"];
-        };
-        Job: {
-            requiredSkills?: components["schemas"]["Skills"];
-            /** Format: double */
-            maxTimeInVehicle?: number;
-            activities?: components["schemas"]["Activity"][];
-            name?: string;
-            /** Format: int32 */
-            priority?: number;
-            id?: string;
-            size?: components["schemas"]["Capacity"];
-            /** Format: int32 */
-            index?: number;
-        };
-        Location: {
-            /** Format: int32 */
-            index?: number;
-            coordinate?: components["schemas"]["Coordinate"];
-            id?: string;
-            name?: string;
-            userData?: Record<string, never>;
-        };
-        Skills: Record<string, never>;
-        Start: {
-            /** Format: int32 */
-            index?: number;
-            /** Format: double */
-            endTime?: number;
-            /** Format: double */
-            arrTime?: number;
-            location?: components["schemas"]["Location"];
-            /** Format: double */
-            theoreticalEarliestOperationStartTime?: number;
-            /** Format: double */
-            theoreticalLatestOperationStartTime?: number;
-            /** Format: double */
-            operationTime?: number;
-            name?: string;
-            size?: components["schemas"]["Capacity"];
-        };
-        TimeWindow: {
-            /** Format: double */
-            start?: number;
-            /** Format: double */
-            end?: number;
-        };
-        TourActivities: {
-            jobs?: components["schemas"]["Job"][];
-            activities?: components["schemas"]["TourActivity"][];
-            empty?: boolean;
-        };
-        TourActivity: {
-            /** Format: double */
-            endTime?: number;
-            /** Format: double */
-            theoreticalEarliestOperationStartTime?: number;
-            /** Format: double */
-            theoreticalLatestOperationStartTime?: number;
-            /** Format: double */
-            operationTime?: number;
-            /** Format: double */
-            arrTime?: number;
-            name?: string;
-            location?: components["schemas"]["Location"];
-            size?: components["schemas"]["Capacity"];
-            /** Format: int32 */
-            index?: number;
-        };
-        Vehicle: {
-            userData?: Record<string, never>;
-            vehicleTypeIdentifier?: components["schemas"]["VehicleTypeKey"];
-            /** Format: double */
-            earliestDeparture?: number;
-            /** Format: double */
-            latestArrival?: number;
-            returnToDepot?: boolean;
-            startLocation?: components["schemas"]["Location"];
-            endLocation?: components["schemas"]["Location"];
-            skills?: components["schemas"]["Skills"];
-            break?: components["schemas"]["Break"];
-            id?: string;
-            type?: components["schemas"]["VehicleType"];
-            /** Format: int32 */
-            index?: number;
-        };
-        VehicleCostParams: {
-            /** Format: double */
-            fix?: number;
-            /** Format: double */
-            perTransportTimeUnit?: number;
-            /** Format: double */
-            perDistanceUnit?: number;
-            /** Format: double */
-            perWaitingTimeUnit?: number;
-            /** Format: double */
-            perServiceTimeUnit?: number;
-        };
-        VehicleRoute: {
-            tourActivities?: components["schemas"]["TourActivities"];
-            vehicle?: components["schemas"]["Vehicle"];
-            driver?: components["schemas"]["Driver"];
-            start?: components["schemas"]["Start"];
-            end?: components["schemas"]["End"];
-            /** Format: double */
-            departureTime?: number;
-            activities?: components["schemas"]["TourActivity"][];
-            empty?: boolean;
-        };
-        VehicleRoutingProblemSolution: {
-            routes?: components["schemas"]["VehicleRoute"][];
-            unassignedJobs?: components["schemas"]["Job"][];
-            /** Format: double */
-            cost?: number;
-        };
-        VehicleType: {
-            userData?: Record<string, never>;
-            capacityDimensions?: components["schemas"]["Capacity"];
-            vehicleCostParams?: components["schemas"]["VehicleCostParams"];
-            profile?: string;
-            typeId?: string;
-            /** Format: double */
-            maxVelocity?: number;
-        };
-        VehicleTypeKey: {
-            /** Format: int32 */
-            index?: number;
-            type?: string;
-            startLocationId?: string;
-            endLocationId?: string;
-            /** Format: double */
-            earliestStart?: number;
-            /** Format: double */
-            latestEnd?: number;
-            skills?: components["schemas"]["Skills"];
-            returnToDepot?: boolean;
-        };
-        Hints: {
-            /** Format: int32 */
-            visitedNodesSum?: number;
-            /** Format: double */
-            visitedNodesAverage?: number;
-        };
-        Info: {
-            copyrights?: string[];
-            /** Format: int32 */
-            took?: number;
-            roadDataTimeStamp?: string;
-        };
-        Instruction: {
-            /** Format: double */
-            distance?: number;
-            /** Format: double */
-            heading?: number;
-            /** Format: int32 */
-            sign?: number;
-            interval?: number[];
-            text?: string;
-            /** Format: int64 */
-            time?: number;
-            streetName?: string;
-            /** Format: double */
-            lastHeading?: number;
-        };
-        Leg: Record<string, never>;
-        Path: {
-            /** Format: double */
-            distance?: number;
-            /** Format: double */
-            weight?: number;
-            /** Format: int64 */
-            time?: number;
-            /** Format: int32 */
-            transfers?: number;
-            pointsEncoded?: boolean;
-            /** Format: double */
-            pointsEncodedMultiplier?: number;
-            bbox?: number[];
-            points?: string;
-            instructions?: components["schemas"]["Instruction"][];
-            legs?: components["schemas"]["Leg"][];
-            details?: {
-                [key: string]: Record<string, never>;
-            };
-            /** Format: double */
-            ascend?: number;
-            /** Format: double */
-            descend?: number;
-            snappedWaypoints?: string;
-        };
-        RouteResponse: {
-            hints?: components["schemas"]["Hints"];
-            info?: components["schemas"]["Info"];
-            paths?: components["schemas"]["Path"][];
-        };
+  schemas: {
+    CoordinateDto: {
+      /** Format: double */
+      lat: number;
+      /** Format: double */
+      lng: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    FleetInstructionsRequest: {
+      vehicles?: components["schemas"]["VehicleDto"][];
+      jobs?: components["schemas"]["JobDto"][];
+    };
+    JobDto: {
+      id?: string;
+      position: components["schemas"]["CoordinateDto"];
+      /** Format: double */
+      serviceTime?: number;
+      /** Format: double */
+      earliestTime?: number;
+      /** Format: double */
+      latestTime?: number;
+    };
+    VehicleDto: {
+      id?: string;
+      position: components["schemas"]["CoordinateDto"];
+      /** Format: double */
+      capacity?: number;
+      /** Format: double */
+      earliestTime?: number;
+      /** Format: double */
+      latestTime?: number;
+      /** Format: double */
+      serviceTime?: number;
+    };
+    Activity: {
+      location?: components["schemas"]["Location"];
+      timeWindows?: components["schemas"]["TimeWindow"][];
+      /** Format: double */
+      serviceTime?: number;
+      /** @enum {string} */
+      activityType?: "PICKUP" | "DELIVERY" | "SERVICE" | "BREAK";
+    };
+    Break: {
+      /** Format: int32 */
+      index?: number;
+      userData?: Record<string, never>;
+      id?: string;
+      type?: string;
+      size?: components["schemas"]["Capacity"];
+      name?: string;
+      location?: components["schemas"]["Location"];
+      timeWindows?: components["schemas"]["TimeWindow"][];
+      /** Format: int32 */
+      priority?: number;
+      /** Format: double */
+      maxTimeInVehicle?: number;
+      activities?: components["schemas"]["Activity"][];
+      timeWindow?: components["schemas"]["TimeWindow"];
+      requiredSkills?: components["schemas"]["Skills"];
+      /** Format: double */
+      serviceDuration?: number;
+    };
+    Capacity: {
+      /** Format: int32 */
+      nuOfDimensions?: number;
+    };
+    Coordinate: {
+      /** Format: double */
+      x?: number;
+      /** Format: double */
+      y?: number;
+    };
+    Driver: {
+      id?: string;
+    };
+    End: {
+      /** Format: int32 */
+      index?: number;
+      /** Format: double */
+      endTime?: number;
+      /** Format: double */
+      arrTime?: number;
+      location?: components["schemas"]["Location"];
+      name?: string;
+      size?: components["schemas"]["Capacity"];
+      /** Format: double */
+      theoreticalLatestOperationStartTime?: number;
+      /** Format: double */
+      theoreticalEarliestOperationStartTime?: number;
+      /** Format: double */
+      operationTime?: number;
+    };
+    Job: {
+      name?: string;
+      /** Format: int32 */
+      priority?: number;
+      id?: string;
+      size?: components["schemas"]["Capacity"];
+      activities?: components["schemas"]["Activity"][];
+      requiredSkills?: components["schemas"]["Skills"];
+      /** Format: double */
+      maxTimeInVehicle?: number;
+      /** Format: int32 */
+      index?: number;
+    };
+    Location: {
+      /** Format: int32 */
+      index?: number;
+      coordinate?: components["schemas"]["Coordinate"];
+      id?: string;
+      name?: string;
+      userData?: Record<string, never>;
+    };
+    Skills: Record<string, never>;
+    Start: {
+      /** Format: int32 */
+      index?: number;
+      /** Format: double */
+      endTime?: number;
+      /** Format: double */
+      arrTime?: number;
+      location?: components["schemas"]["Location"];
+      name?: string;
+      size?: components["schemas"]["Capacity"];
+      /** Format: double */
+      theoreticalLatestOperationStartTime?: number;
+      /** Format: double */
+      theoreticalEarliestOperationStartTime?: number;
+      /** Format: double */
+      operationTime?: number;
+    };
+    TimeWindow: {
+      /** Format: double */
+      start?: number;
+      /** Format: double */
+      end?: number;
+    };
+    TourActivities: {
+      jobs?: components["schemas"]["Job"][];
+      empty?: boolean;
+      activities?: components["schemas"]["TourActivity"][];
+    };
+    TourActivity: {
+      [x: string]: any;
+      /** Format: double */
+      endTime?: number;
+      name?: string;
+      location?: components["schemas"]["Location"];
+      size?: components["schemas"]["Capacity"];
+      /** Format: double */
+      theoreticalLatestOperationStartTime?: number;
+      /** Format: double */
+      theoreticalEarliestOperationStartTime?: number;
+      /** Format: double */
+      arrTime?: number;
+      /** Format: double */
+      operationTime?: number;
+      /** Format: int32 */
+      index?: number;
+    };
+    Vehicle: {
+      userData?: Record<string, never>;
+      id?: string;
+      type?: components["schemas"]["VehicleType"];
+      vehicleTypeIdentifier?: components["schemas"]["VehicleTypeKey"];
+      endLocation?: components["schemas"]["Location"];
+      skills?: components["schemas"]["Skills"];
+      break?: components["schemas"]["Break"];
+      /** Format: double */
+      earliestDeparture?: number;
+      /** Format: double */
+      latestArrival?: number;
+      returnToDepot?: boolean;
+      startLocation?: components["schemas"]["Location"];
+      /** Format: int32 */
+      index?: number;
+    };
+    VehicleCostParams: {
+      /** Format: double */
+      fix?: number;
+      /** Format: double */
+      perTransportTimeUnit?: number;
+      /** Format: double */
+      perDistanceUnit?: number;
+      /** Format: double */
+      perWaitingTimeUnit?: number;
+      /** Format: double */
+      perServiceTimeUnit?: number;
+    };
+    VehicleRoute: {
+      tourActivities?: components["schemas"]["TourActivities"];
+      vehicle?: components["schemas"]["Vehicle"];
+      driver?: components["schemas"]["Driver"];
+      start?: components["schemas"]["Start"];
+      end?: components["schemas"]["End"];
+      empty?: boolean;
+      activities?: components["schemas"]["TourActivity"][];
+      /** Format: double */
+      departureTime?: number;
+    };
+    VehicleRoutingProblemSolution: {
+      routes?: components["schemas"]["VehicleRoute"][];
+      unassignedJobs?: components["schemas"]["Job"][];
+      /** Format: double */
+      cost?: number;
+    };
+    VehicleType: {
+      userData?: Record<string, never>;
+      profile?: string;
+      typeId?: string;
+      /** Format: double */
+      maxVelocity?: number;
+      capacityDimensions?: components["schemas"]["Capacity"];
+      vehicleCostParams?: components["schemas"]["VehicleCostParams"];
+    };
+    VehicleTypeKey: {
+      /** Format: int32 */
+      index?: number;
+      type?: string;
+      startLocationId?: string;
+      endLocationId?: string;
+      /** Format: double */
+      earliestStart?: number;
+      /** Format: double */
+      latestEnd?: number;
+      skills?: components["schemas"]["Skills"];
+      returnToDepot?: boolean;
+    };
+    Hints: {
+      /** Format: int32 */
+      visitedNodesSum?: number;
+      /** Format: double */
+      visitedNodesAverage?: number;
+    };
+    Info: {
+      copyrights?: string[];
+      /** Format: int32 */
+      took?: number;
+      roadDataTimeStamp?: string;
+    };
+    Instruction: {
+      /** Format: double */
+      distance?: number;
+      /** Format: double */
+      heading?: number;
+      /** Format: int32 */
+      sign?: number;
+      interval?: number[];
+      text?: string;
+      /** Format: int64 */
+      time?: number;
+      streetName?: string;
+      /** Format: double */
+      lastHeading?: number;
+    };
+    Leg: Record<string, never>;
+    Path: {
+      /** Format: double */
+      distance?: number;
+      /** Format: double */
+      weight?: number;
+      /** Format: int64 */
+      time?: number;
+      /** Format: int32 */
+      transfers?: number;
+      pointsEncoded?: boolean;
+      /** Format: double */
+      pointsEncodedMultiplier?: number;
+      bbox?: number[];
+      points?: string;
+      instructions?: components["schemas"]["Instruction"][];
+      legs?: components["schemas"]["Leg"][];
+      details?: {
+        [key: string]: Record<string, never>;
+      };
+      /** Format: double */
+      ascend?: number;
+      /** Format: double */
+      descend?: number;
+      snappedWaypoints?: string;
+    };
+    RouteResponse: {
+      hints?: components["schemas"]["Hints"];
+      info?: components["schemas"]["Info"];
+      paths?: components["schemas"]["Path"][];
+      job?: components["schemas"]["Job"];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    vehicleRoutingProblemSolver: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["FleetInstructionsRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["VehicleRoutingProblemSolution"];
-                };
-            };
-        };
+  vehicleRoutingProblemSolver: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    route: {
-        parameters: {
-            query: {
-                from: components["schemas"]["CoordinateDto"];
-                to: components["schemas"]["CoordinateDto"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RouteResponse"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FleetInstructionsRequest"];
+      };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "*/*": components["schemas"]["VehicleRoutingProblemSolution"];
+        };
+      };
+    };
+  };
+  route: {
+    parameters: {
+      query: {
+        from: components["schemas"]["CoordinateDto"];
+        to: components["schemas"]["CoordinateDto"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "*/*": components["schemas"]["RouteResponse"];
+        };
+      };
+    };
+  };
 }

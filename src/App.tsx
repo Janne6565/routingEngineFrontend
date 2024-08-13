@@ -30,7 +30,7 @@ function App() {
   const [currentPlacementType, setCurrentPlacementType] = useState<
     "job" | "driver"
   >("job");
-  const { data, isLoading, isFetching } = useOptimalRouteInstruction(
+  const { data, isLoading, isFetching, refetch } = useOptimalRouteInstruction(
     buildRequestData(drivers, jobs)
   );
 
@@ -65,9 +65,10 @@ function App() {
   };
 
   const bounds: LatLngTuple[] = [
-    [52.327972, 13.069778],
-    [52.6803845, 13.7624957],
+    [47.27101, 5.8630797],
+    [60.4363296, 25.1965582],
   ];
+
 
   const placePoint = useCallback(
     (position: LatLng) => {
@@ -94,7 +95,7 @@ function App() {
   );
 
   const calculate = useCallback(() => {
-    queryClient.invalidateQueries(["getOptimalRoute"]);
+    refetch();
   }, [jobs, drivers, queryClient]);
 
   return (

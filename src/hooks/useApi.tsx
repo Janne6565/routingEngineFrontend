@@ -99,6 +99,7 @@ const useApi = (baseUrl: string) => {
           geoJsons: geoJsons,
         };
       },
+      enabled: false
     });
 
   return {

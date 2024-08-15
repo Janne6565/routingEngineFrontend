@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { LatLng, LatLngTuple } from "leaflet";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { components } from "./api/routingEngine/schema";
 import DisplayDriverTodos from "./components/DisplayDriverTodos";
 import MapComponent from "./components/MapComponent";
 import useApi from "./hooks/useApi";
 
 import "./style.css";
+import { useImport } from "./hooks/useImport";
+import useUtil from "./hooks/useUtil";
 
 export type JobDto = components["schemas"]["JobDto"];
 export type VehicleDto = components["schemas"]["VehicleDto"];
@@ -27,12 +29,14 @@ function App() {
   const [jobs, setJobs] = useState<JobDto[]>([]);
   const [drivers, setDrivers] = useState<VehicleDto[]>([]);
   const { useOptimalRouteInstruction } = useApi(baseUrl);
+  const { convertStringDateTimeToMinutes } = useUtil();
   const [currentPlacementType, setCurrentPlacementType] = useState<
     "job" | "driver"
   >("job");
   const { data, isLoading, isFetching, refetch } = useOptimalRouteInstruction(
     buildRequestData(drivers, jobs)
   );
+  const { useData } = useImport();
 
   const setDriver = (index: number, driver: VehicleDto) => {
     setDrivers((drivers) => {
@@ -63,6 +67,36 @@ function App() {
   const buildDriverSetter = (index: number) => {
     return (driver: VehicleDto) => setDriver(index, driver);
   };
+
+  useEffect(() => {
+    const data = useData();
+    type driverJsonDataType = (typeof data)[number];
+    let counter = 0;
+    const mappings = {
+      position: (job: driverJsonDataType) => {
+        return { lat: job.LATITUDE, lng: job.LONGITUDE };
+      },
+      earliestTime: (job: driverJsonDataType) =>
+        convertStringDateTimeToMinutes(job.START_TIME),
+      latestTime: (job: driverJsonDataType) =>
+        convertStringDateTimeToMinutes(job.END_TIME),
+      serviceTime: (job: driverJsonDataType) => job.DURATION,
+      id: (job: driverJsonDataType) => "importedJob" + job.INDEX,
+    };
+    const constructJobDto = (job: driverJsonDataType) => {
+      const buildingJobDto: JobDto = {};
+
+      for (const key of Object.keys(mappings)) {
+        buildingJobDto[key] = mappings[key](job);
+      }
+      return buildingJobDto;
+    };
+
+    data.forEach((driver) => {
+      addJob(constructJobDto(driver));
+    })
+
+  }, []);
 
   const bounds: LatLngTuple[] = [
     [47.27101, 5.8630797],

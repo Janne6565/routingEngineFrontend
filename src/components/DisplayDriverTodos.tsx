@@ -58,14 +58,14 @@ function DisplayDriverTodos(props: Props) {
       "",
     ]) ?? [];
   const convertTime = (time: number | undefined) => {
-    return time ? Math.round(time) + "min" : "";
+    return time ? Math.round(time) + "min" : "0min";
   };
 
   return routes?.map((route, index) => (
     <div key={index}>
       <h1>{route.vehicle?.id ?? ""}</h1>
       <div className="route">
-        {"0min HomeLocation -> "}{" "}
+        {"HomeLocation " + convertTime(route.start?.arrTime) + " -> "}
         {route.activities?.map(
           (activity) =>
             convertTime(activity.arrTime) +

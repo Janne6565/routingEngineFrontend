@@ -92,6 +92,22 @@ const useApi = (baseUrl: string) => {
             geoJsons.push(geoJson);
             currentPosition = nextPosition;
           }
+          const lastPosition = route.end?.location?.coordinate;
+          const request = await fetch(
+            baseUrl + "/route?" + 
+            new URLSearchParams({
+              from: convertCoordinateToString(currentPosition!),
+              to: convertCoordinateToString(lastPosition!)
+            }),
+            {
+              method: "GET"
+            }
+          )
+
+          const res = (await request.json()) as RouteResponse;
+          const geoJson = loadGeoJsonFromResponse(res.paths![0]);
+          geoJsons.push(geoJson);
+
         }
 
         return {

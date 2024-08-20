@@ -9,33 +9,27 @@ import useApi from "./hooks/useApi";
 import "./style.css";
 import { useImport } from "./hooks/useImport";
 import useUtil from "./hooks/useUtil";
+import { FeatureCollection } from "geojson";
 
-export type JobDto = components["schemas"]["JobDto"];
 export type VehicleDto = components["schemas"]["VehicleDto"];
 
-const buildRequestData = (
-  driverPositions: VehicleDto[],
-  jobPositions: JobDto[]
-): components["schemas"]["FleetInstructionsRequest"] => {
-  return {
-    jobs: jobPositions,
-    vehicles: driverPositions,
-  };
-};
+export type JobDto = components["schemas"]["JobDto"] & {
+  timeArrival?: number,
+  timeDeparture?: number,
+}
 
 function App() {
   const baseUrl = "http://localhost:8080";
   const queryClient = useQueryClient();
   const [jobs, setJobs] = useState<JobDto[]>([]);
+  const [uuid, setUUID] = useState("");
   const [drivers, setDrivers] = useState<VehicleDto[]>([]);
-  const { useOptimalRouteInstruction } = useApi(baseUrl);
+  const { useRouteLoadingFromUuidAsync } = useApi(baseUrl);
   const { convertStringDateTimeToMinutes } = useUtil();
   const [currentPlacementType, setCurrentPlacementType] = useState<
     "job" | "driver"
   >("job");
-  const { data, isLoading, isFetching, refetch } = useOptimalRouteInstruction(
-    buildRequestData(drivers, jobs)
-  );
+  const [geoJson, setGeoJson] = useState<FeatureCollection[]>([]);
   const { useData } = useImport();
 
   const setDriver = (index: number, driver: VehicleDto) => {
@@ -72,6 +66,7 @@ function App() {
     const data = useData();
     type driverJsonDataType = (typeof data)[number];
     let counter = 0;
+
     const mappings = {
       position: (job: driverJsonDataType) => {
         return { lat: job.LATITUDE, lng: job.LONGITUDE };
@@ -83,20 +78,16 @@ function App() {
       serviceTime: (job: driverJsonDataType) => job.DURATION,
       id: (job: driverJsonDataType) => "importedJob" + job.INDEX,
     };
-    const constructJobDto = (job: driverJsonDataType) => {
-      const buildingJobDto: JobDto = {};
-
-      for (const key of Object.keys(mappings)) {
-        buildingJobDto[key] = mappings[key](job);
-      }
-      return buildingJobDto;
-    };
-
-    data.forEach((driver) => {
-      addJob(constructJobDto(driver));
-    })
-
   }, []);
+
+  const loadFromUuid = useCallback(() => {
+    useRouteLoadingFromUuidAsync(uuid).then((res) => {
+      console.log(res.jobs);
+      setJobs([...res.jobs]);
+      setDrivers(res.drivers);
+      setGeoJson(res.geoJsonCollection);
+    })
+  }, [uuid])
 
   const bounds: LatLngTuple[] = [
     [47.27101, 5.8630797],
@@ -127,10 +118,6 @@ function App() {
     [currentPlacementType, drivers.length, jobs.length]
   );
 
-  const calculate = useCallback(() => {
-    refetch();
-  }, [jobs, drivers, queryClient]);
-
   return (
     <>
       <h1>Routing Engine :) </h1>
@@ -153,11 +140,10 @@ function App() {
         clickHandler={placePoint}
         driverSetterBuilder={buildDriverSetter}
         jobSetterBuilder={buildJobSetter}
-        geoJson={data?.geoJsons}
+        geoJson={geoJson}
       />
-      <button onClick={calculate}>Calculate</button>
-      {isLoading || isFetching ? <p>Loading...</p> : ""}
-      {data ? <DisplayDriverTodos routerInstructionResponse={data} /> : ""}
+      <input type="text" placeholder="uuid" onChange={(e) => setUUID(e.target.value)}/>
+      <button onClick={loadFromUuid}>Load from uuid</button>
     </>
   );
 }

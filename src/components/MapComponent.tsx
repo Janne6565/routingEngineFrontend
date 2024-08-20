@@ -7,6 +7,7 @@ import { JobDto, VehicleDto } from "../App";
 import DriverMarkerComponent from "./DriverMarkerComponent";
 import JobMarkerComponent from "./JobMarkerComponent";
 import MapClickListener from "./MapClickListener";
+import MarkerClusterGroup from "react-leaflet-cluster";
 
 type Props = {
   driverPositions: VehicleDto[];
@@ -25,7 +26,7 @@ function MapComponent(props: Props) {
         center={[52.505284, 11.418273]}
         zoom={7}
         scrollWheelZoom={true}
-        style={{ height: "60vh", width: "60vw" }}
+        style={{ height: "100vh", width: "100vw" }}
       >
         {props.geoJson
           ? props.geoJson.map((geoJson, index) => (
@@ -47,22 +48,24 @@ function MapComponent(props: Props) {
             strokeOpacity={0.5}
             strokeWidth={2}
           />
-          {props.driverPositions.map((driver: VehicleDto) => (
-            <DriverMarkerComponent
-              driver={driver}
-              setter={props.driverSetterBuilder(
-                props.driverPositions.indexOf(driver)
-              )}
-              key={driver.id}
-            />
-          ))}
-          {props.jobPositions.map((job: JobDto) => (
-            <JobMarkerComponent
-              job={job}
-              setter={props.jobSetterBuilder(props.jobPositions.indexOf(job))}
-              key={job.id}
-            />
-          ))}
+          <MarkerClusterGroup chunkedLoading>
+            {props.driverPositions.map((driver: VehicleDto) => (
+              <DriverMarkerComponent
+                driver={driver}
+                setter={props.driverSetterBuilder(
+                  props.driverPositions.indexOf(driver)
+                )}
+                key={driver.id}
+              />
+            ))}
+            {props.jobPositions.map((job: JobDto) => (
+              <JobMarkerComponent
+                job={job}
+                setter={props.jobSetterBuilder(props.jobPositions.indexOf(job))}
+                key={job.id}
+              />
+            ))}
+          </MarkerClusterGroup>
         </SVGOverlay>
         <MapClickListener onclick={props.clickHandler} />
       </MapContainer>

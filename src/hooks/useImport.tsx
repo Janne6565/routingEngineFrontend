@@ -24,7 +24,7 @@ export const useImport = () => {
 
       return res;
     });
-    return rows.filter((row) => row.LATITUDE != 0 && row.LONGITUDE != 0).slice(0, 100);
+    return rows.filter((row) => row.LATITUDE != 0 && row.LONGITUDE != 0);
   };
   return { useData };
 };

@@ -2,6 +2,7 @@ import polyline from "@mapbox/polyline";
 import { useQuery } from "@tanstack/react-query";
 import { FeatureCollection } from "geojson";
 import { components, operations } from "../api/routingEngine/schema";
+import { JobDto, VehicleDto } from "../App";
 
 const convertCoordinateDtoToString = (
   coord: components["schemas"]["CoordinateDto"] | undefined
@@ -15,6 +16,16 @@ export type RouteInstructionResponse =
   operations["vehicleRoutingProblemSolver"]["responses"]["200"]["content"]["*/*"];
 export type RouteResponse =
   operations["route"]["responses"]["200"]["content"]["*/*"];
+
+const locationToPosition = (
+  location: components["schemas"]["Location"] | undefined
+): components["schemas"]["CoordinateDto"] =>
+  location
+    ? {
+        lat: location.coordinate?.x ?? 0,
+        lng: location.coordinate?.y ?? 0,
+      }
+    : { lat: 0, lng: 0 };
 
 const loadGeoJsonFromResponse = (
   path: components["schemas"]["Path"]
@@ -37,6 +48,72 @@ const loadGeoJsonFromResponse = (
 };
 
 const useApi = (baseUrl: string) => {
+  const useRouteLoadingFromUuidAsync = async (id: string) => {
+    const response = await fetch(baseUrl + "/fleetInstructions/" + id, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/JSON",
+      },
+    });
+
+    const res = (await response.json()) as RouteInstructionResponse;
+    const geoJsonCollection: FeatureCollection[] = [];
+    const drivers: VehicleDto[] = [];
+    const jobs: JobDto[] = [];
+
+    for (let route of res.routes!) {
+      drivers.push({
+        position: locationToPosition(route.vehicle?.startLocation),
+        capacity: undefined,
+        earliestTime: route.vehicle?.earliestDeparture,
+        id: route.vehicle?.id,
+        latestTime: route.vehicle?.latestArrival,
+      });
+      let lastPosition = locationToPosition(route.start?.location);
+
+      for (let activity of route.activities!) {
+        const geoJson = await fetchGeoJson(
+          lastPosition,
+          locationToPosition(activity.location)
+        );
+        geoJsonCollection.push(geoJson);
+        lastPosition = locationToPosition(activity.location);
+
+        jobs.push({
+          position: locationToPosition(activity.location),
+          earliestTime: activity.theoreticalEarliestOperationStartTime,
+          latestTime: activity.theoreticalLatestOperationStartTime,
+          id: activity.name,
+          serviceTime: activity.operationTime,
+        });
+      }
+
+      geoJsonCollection.push(
+        await fetchGeoJson(
+          lastPosition,
+          locationToPosition(route.end?.location)
+        )
+      );
+    };
+    
+    return { drivers, jobs, geoJsonCollection };
+  };
+
+  const fetchGeoJson = async (
+    from: components["schemas"]["CoordinateDto"],
+    to: components["schemas"]["CoordinateDto"]
+  ) => {
+    const urlSearchParams = new URLSearchParams({
+      from: convertCoordinateDtoToString(from),
+      to: convertCoordinateDtoToString(to),
+    });
+    const response = await fetch(
+      baseUrl + "/route?" + urlSearchParams.toString()
+    );
+    const res = (await response.json()) as RouteResponse;
+    return loadGeoJsonFromResponse(res.paths![0]);
+  };
+
   const useRoute = (data: operations["route"]["parameters"]["query"]) =>
     useQuery({
       queryKey: ["getRoute"],
@@ -51,8 +128,15 @@ const useApi = (baseUrl: string) => {
             method: "GET",
           }
         );
-        return await response.json();
+        const res = (await response.json()) as RouteResponse;
+        return loadGeoJsonFromResponse(res.paths![0]);
       },
+    });
+
+  const useRouteLoading = (id: string) =>
+    useQuery({
+      queryKey: ["loadOptimalRoute"],
+      queryFn: () => useRouteLoadingFromUuidAsync(id),
     });
 
   const useOptimalRouteInstruction = (
@@ -94,20 +178,20 @@ const useApi = (baseUrl: string) => {
           }
           const lastPosition = route.end?.location?.coordinate;
           const request = await fetch(
-            baseUrl + "/route?" + 
-            new URLSearchParams({
-              from: convertCoordinateToString(currentPosition!),
-              to: convertCoordinateToString(lastPosition!)
-            }),
+            baseUrl +
+              "/route?" +
+              new URLSearchParams({
+                from: convertCoordinateToString(currentPosition!),
+                to: convertCoordinateToString(lastPosition!),
+              }),
             {
-              method: "GET"
+              method: "GET",
             }
-          )
+          );
 
           const res = (await request.json()) as RouteResponse;
           const geoJson = loadGeoJsonFromResponse(res.paths![0]);
           geoJsons.push(geoJson);
-
         }
 
         return {
@@ -120,7 +204,9 @@ const useApi = (baseUrl: string) => {
 
   return {
     useOptimalRouteInstruction,
-    getRoute: useRoute,
+    useRoute,
+    useRouteLoading,
+    useRouteLoadingFromUuidAsync
   };
 };
 

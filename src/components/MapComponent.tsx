@@ -1,22 +1,21 @@
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { LatLng, LatLngTuple } from "leaflet";
+import { geoJSON, LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, SVGOverlay, TileLayer } from "react-leaflet";
 import { GeoJSON } from "react-leaflet/GeoJSON";
 import { JobDto, VehicleDto } from "../App";
 import DriverMarkerComponent from "./DriverMarkerComponent";
 import JobMarkerComponent from "./JobMarkerComponent";
-import MapClickListener from "./MapClickListener";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { GeoJsonWithId } from "../hooks/useApi";
 
 type Props = {
   driverPositions: VehicleDto[];
   jobPositions: JobDto[];
-  clickHandler: (position: LatLng) => void;
   bounds: LatLngTuple[];
   driverSetterBuilder: (index: number) => (driver: VehicleDto) => void;
   jobSetterBuilder: (index: number) => (job: JobDto) => void;
-  geoJson: FeatureCollection<Geometry, GeoJsonProperties>[] | undefined;
+  geoJson: GeoJsonWithId[] | undefined;
 };
 
 function MapComponent(props: Props) {
@@ -26,11 +25,11 @@ function MapComponent(props: Props) {
         center={[52.505284, 11.418273]}
         zoom={7}
         scrollWheelZoom={true}
-        style={{ height: "100vh", width: "100vw" }}
+        style={{ height: "80vh", width: "70vw" }}
       >
         {props.geoJson
           ? props.geoJson.map((geoJson, index) => (
-              <GeoJSON data={geoJson} key={index} />
+              <GeoJSON data={geoJson} key={geoJson.id}/>
             ))
           : ""}
         <TileLayer
@@ -67,7 +66,6 @@ function MapComponent(props: Props) {
             ))}
           </MarkerClusterGroup>
         </SVGOverlay>
-        <MapClickListener onclick={props.clickHandler} />
       </MapContainer>
     </>
   );

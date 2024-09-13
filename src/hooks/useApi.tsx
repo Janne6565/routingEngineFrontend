@@ -2,7 +2,7 @@ import polyline from "@mapbox/polyline";
 import { useQuery } from "@tanstack/react-query";
 import { FeatureCollection } from "geojson";
 import { components, operations } from "../api/routingEngine/schema";
-import { JobDto, VehicleDto } from "../App";
+import { JobDto, Route, VehicleDto } from "../App";
 
 const convertCoordinateDtoToString = (
   coord: components["schemas"]["CoordinateDto"] | undefined
@@ -16,6 +16,11 @@ export type RouteInstructionResponse =
   operations["vehicleRoutingProblemSolver"]["responses"]["200"]["content"]["*/*"];
 export type RouteResponse =
   operations["route"]["responses"]["200"]["content"]["*/*"];
+export type GenericRouteResponse = (components["schemas"]["CoordinateDto"] & {
+  driver_id: string;
+})[][];
+
+export type GeoJsonWithId = GeoJSON.FeatureCollection & { id: string | undefined };
 
 const locationToPosition = (
   location: components["schemas"]["Location"] | undefined
@@ -57,7 +62,7 @@ const useApi = (baseUrl: string) => {
     });
 
     const res = (await response.json()) as RouteInstructionResponse;
-    const geoJsonCollection: FeatureCollection[] = [];
+    const routes: Route[] = [];
     const drivers: VehicleDto[] = [];
     const jobs: JobDto[] = [];
 
@@ -70,13 +75,24 @@ const useApi = (baseUrl: string) => {
         latestTime: route.vehicle?.latestArrival,
       });
       let lastPosition = locationToPosition(route.start?.location);
+      const returnedRoute: Route = {
+        geoData: [],
+        distance: 0,
+        drivingTime: 0,
+        driverId: route.vehicle?.id!,
+      };
 
       for (let activity of route.activities!) {
-        const geoJson = await fetchGeoJson(
+        const routeResponse = await fetchGeoJson(
           lastPosition,
           locationToPosition(activity.location)
         );
-        geoJsonCollection.push(geoJson);
+        const geoJson = routeResponse.geoJson as GeoJsonWithId;
+        geoJson.id = route.vehicle?.id! + " job" + activity.index!;
+        returnedRoute.geoData.push(geoJson);
+        returnedRoute.distance += routeResponse.distance;
+        returnedRoute.drivingTime += routeResponse.duration;
+
         lastPosition = locationToPosition(activity.location);
 
         jobs.push({
@@ -87,16 +103,58 @@ const useApi = (baseUrl: string) => {
           serviceTime: activity.operationTime,
         });
       }
-
-      geoJsonCollection.push(
-        await fetchGeoJson(
-          lastPosition,
-          locationToPosition(route.end?.location)
-        )
+      const routeToEndResponse = await fetchGeoJson(
+        lastPosition,
+        locationToPosition(route.end?.location)
       );
+      const geoJson = routeToEndResponse.geoJson as GeoJsonWithId;
+      geoJson.id = route.vehicle?.id! + " returnHome";
+      returnedRoute.distance += routeToEndResponse.distance;
+      returnedRoute.drivingTime += routeToEndResponse.duration;
+      returnedRoute.geoData.push(geoJson);
+      routes.push(returnedRoute);
+    }
+
+    return {
+      drivers,
+      jobs,
+      routes,
     };
-    
-    return { drivers, jobs, geoJsonCollection };
+  };
+
+  const useGenericRouteLoader = async (url: string) => {
+    const response = await fetch(url);
+    const res = (await response.json()) as GenericRouteResponse;
+    const routes: Route[] = [];
+
+    for (let route of res) {
+      let lastPosition = route[0];
+      const geoData = [];
+      let distance = 0;
+      let drivingTime = 0;
+      for (let position of route.slice(1)) {
+        const {
+          geoJson,
+          distance: routeDistance,
+          duration: routeDuration,
+        } = await fetchGeoJson(lastPosition, position);
+        const geoJsonWithId = geoJson as GeoJsonWithId;
+        geoJsonWithId.id = position.driver_id + " " + position.lat + " " + position.lng;
+        distance += routeDistance;
+        drivingTime += routeDuration;
+        geoData.push(geoJsonWithId);
+        lastPosition = position;
+      }
+
+      routes.push({
+        geoData: geoData,
+        distance: distance,
+        drivingTime: drivingTime,
+        driverId: route[0].driver_id,
+      });
+    }
+
+    return { routes };
   };
 
   const fetchGeoJson = async (
@@ -111,7 +169,11 @@ const useApi = (baseUrl: string) => {
       baseUrl + "/route?" + urlSearchParams.toString()
     );
     const res = (await response.json()) as RouteResponse;
-    return loadGeoJsonFromResponse(res.paths![0]);
+    return {
+      geoJson: loadGeoJsonFromResponse(res.paths![0]),
+      distance: res.paths![0].distance!,
+      duration: res.paths![0].time! / 1000,
+    };
   };
 
   const useRoute = (data: operations["route"]["parameters"]["query"]) =>
@@ -206,7 +268,8 @@ const useApi = (baseUrl: string) => {
     useOptimalRouteInstruction,
     useRoute,
     useRouteLoading,
-    useRouteLoadingFromUuidAsync
+    useRouteLoadingFromUuidAsync,
+    useGenericRouteLoader,
   };
 };
 
